@@ -1,0 +1,78 @@
+﻿@using Microsoft.AspNetCore.Identity
+@using webshop_2.Data;
+@inject SignInManager<AppUser> SignInManager
+@inject UserManager<AppUser> UserManager
+
+@model webshop_2.Models.Cart
+
+@{
+    ViewData["Title"] = "Index";
+    double totalPrice = 0;
+}
+
+<h1>Index</h1>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.CartItems)
+            </th>
+            <th>
+                Amount
+            </th>
+            <th>
+                Price
+            </th>
+             @if (User.IsInRole("admin")){
+            <th>
+                Deleted
+            </th>}
+        </tr>
+    </thead>
+    <tbody>
+
+
+@foreach (var item in Model.CartItems) {
+            @if (User.IsInRole("admin") || !item.IsDeleted)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.ShopItem.Name)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Amount)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Price)
+                    </td>
+                    @if (User.IsInRole("admin"))
+                    {
+                        <td>
+                            @Html.DisplayFor(modelItem => item.IsDeleted)
+                        </td>
+                    }
+                    <td>
+                        <a asp-action="Details" asp-route-id="@item.Id">Details</a>
+                        <a asp-action="Edit" asp-route-id="@item.Id">Edit</a>
+                        <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                    </td>
+                </tr>
+
+                @if (!item.IsDeleted) { totalPrice += (double)item.Amount * item.Price; }
+            }
+        }
+
+        <td>Total Price:</td>
+        <td></td>
+        <td>@totalPrice</td>
+    </tbody>
+</table>
+
+<form asp-controller="Cart" asp-action="SendOrder" asp-route-id="@Model.Id" method="post">
+    <input id="Submit" type="submit" value="Pay and Place Order" />
+</form>
+
+<form asp-controller="Cart" asp-action="ClearCart" asp-route-id="@Model.Id" method="post">
+    <input id="Submit" type="submit" value="Clear Cart" />
+</form>

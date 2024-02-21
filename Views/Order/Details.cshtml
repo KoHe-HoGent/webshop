@@ -1,0 +1,112 @@
+﻿@model webshop_2.Models.Order
+
+@{
+    ViewData["Title"] = "Details";
+    double totalPrice = 0;
+}
+
+<h1>Order Details</h1>
+
+<div>
+    <h4>Order</h4>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Id)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Id)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Date)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Date)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.AppUser)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.AppUser.Name)
+        </dd>
+        @if (User.IsInRole("admin"))
+        {
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.IsDeleted)
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.IsDeleted)
+            </dd>
+        }
+    </dl>
+</div>
+
+<table class="table">
+    <h4>Cart</h4>
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Cart.CartItems)
+            </th>
+            <th>
+                Amount
+            </th>
+            <th>
+                Price
+            </th>
+            @if (User.IsInRole("admin"))
+            {
+                <th>
+                    Deleted
+                </th>
+            }
+        </tr>
+    </thead>
+    <tbody>
+
+
+        @foreach (var item in Model.Cart.CartItems)
+        {
+            @if (User.IsInRole("admin") || !item.IsDeleted)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.ShopItem.Name)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Amount)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Price)
+                    </td>
+                    @if (User.IsInRole("admin"))
+                    {
+                        <td>
+                            @Html.DisplayFor(modelItem => item.IsDeleted)
+                        </td>
+                    }
+                </tr>
+
+                @if (!item.IsDeleted) { totalPrice += (double)item.Amount * item.Price; }
+            }
+        }
+
+    <td>Total Price:</td>
+    <td></td>
+    <td>@totalPrice</td>
+    </tbody>
+</table>
+
+
+
+
+
+
+
+<div>
+    @if (User.IsInRole("admin"))
+    {
+        <a asp-action="Edit" asp-route-id="@Model?.Id">Edit</a>
+    }
+    <a asp-action="Index">Back to List</a>
+</div>
